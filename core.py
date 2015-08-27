@@ -4,20 +4,40 @@ import numpy as np
 from scipy.signal import fftconvolve
 import math
 
+
+#returns number of array dimensions
 def array_rank(arr):
 	return len(arr.shape)
 
+#pads the window to process its original extend accurately
 def extend_window(window,size,height,width):
-	"""minrow = window[0][0]
-	maxrow = window[0][1]
-	mincol = window[1][0]
-	maxcol = window[1][1]"""
 	minrow = max(window[0][0]-size,0)
 	maxrow = min(window[0][1]+size,height-1)
 	mincol = max(window[1][0]-size,0)
 	maxcol = min(window[1][1]+size,width-1)
 	return ((minrow,maxrow),(mincol,maxcol))
 
+#creates a window generator, in the same format as it is returned by block_windows method
+def generate_windows(height, width, tilerows, tilecols):
+	rownum = int(math.ceil(float(height)/tilerows))
+	colnum = int(math.ceil(float(width)/tilecols))
+	
+	for i in range(rownum):
+		if i == rownum-1:
+			rowsize = height%tilerows
+		else:
+			rowsize = tilerows-1
+		for j in range(colnum):
+			if j == colnum-1:
+				colsize = width%tilecols
+			else:
+				colsize = tilecols-1
+				cell = ((i,j),((i*tilerows,i*tilerows+rowsize),(j*tilecols,j*tilecols+colsize)))
+				yield cell
+
+#original MikeT's function from http://gis.stackexchange.com/a/10467/12768
+#my addition is the conversion of the padded array to float to avoid errors with integer rasters
+#the intended input is a single band raster array
 def gaussian_blur1d(in_array, size):
   # expand in_array to fit edge of kernel
   padded_array = np.pad(in_array, size, 'symmetric').astype(float)
@@ -30,7 +50,9 @@ def gaussian_blur1d(in_array, size):
   # do the Gaussian blur
   out_array = fftconvolve(padded_array, g, mode='valid')
   return out_array.astype(in_array.dtype)
-    
+
+#the intended input is an array with various number of bands
+#if as_np_array is true, returns numpz array, otherwise returns a list
 def gaussian_blur_array(in_array, size, as_np_array=True):
 	in_array = np.asarray(in_array)
 	rank = array_rank(in_array)
@@ -50,6 +72,7 @@ def gaussian_blur_array(in_array, size, as_np_array=True):
 	else:
 		return out
 
+#smooths a raster specified by the file's path (in_path) and writes it to another file (out_path)
 def gaussian_blur(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=None, tiled=False):
 	if tiled:
 		return gaussian_blur_tiled(in_path, out_path, size, tilerows, tilecols, new_crs)
@@ -83,23 +106,8 @@ def gaussian_blur(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=None,
 				out_raster.write(out_array)
 	return True
 
-def generate_windows(height, width, tilerows, tilecols):
-	rownum = int(math.ceil(float(height)/tilerows))
-	colnum = int(math.ceil(float(width)/tilecols))
-	
-	for i in range(rownum):
-		if i == rownum-1:
-			rowsize = height%tilerows
-		else:
-			rowsize = tilerows-1
-		for j in range(colnum):
-			if j == colnum-1:
-				colsize = width%tilecols
-			else:
-				colsize = tilecols-1
-				cell = ((i,j),((i*tilerows,i*tilerows+rowsize),(j*tilecols,j*tilecols+colsize)))
-				yield cell
-
+#version of gaussian_blur function using window-processing to speed up the process for large rasters
+#windows are padded to avoid window/processing artifacts
 def gaussian_blur_tiled(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=None):
 	with rasterio.drivers():
 		with rasterio.open(in_path,'r') as in_raster:
@@ -152,6 +160,7 @@ def gaussian_blur_tiled(in_path, out_path, size, tilerows=0, tilecols=0, new_crs
 					out_raster.write(out_array,window=bigwindow)
 	return True
 
+#edge detection based on subtraction of the result of gaussian_blur function from the original raster
 def gaussian_sharpen(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=None, tiled=False):
 	if tiled:
 		return gaussian_sharpen_tiled(in_path, out_path, size, tilerows, tilecols, new_crs)
@@ -186,6 +195,7 @@ def gaussian_sharpen(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=No
 				out_raster.write(out_array)
 	return True
 
+#window-processed version of gaussian_sharpen
 def gaussian_sharpen_tiled(in_path, out_path, size, tilerows=0, tilecols=0, new_crs=None):
 	with rasterio.drivers():
 		with rasterio.open(in_path,'r') as in_raster:
