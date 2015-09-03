@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=FFT Convolution Filters
+qgisMinimumVersion=2.0
+description=Smoothing and edge detection based on fftconvolve() SciPy function
+version=0.1
+author=Pavel Veselský
+email=pavelveselsky@seznam.cz
+
+about=Smoothing and edge detection based on fftconvolve() SciPy function, as included in the gaussian_blur() function by MikeT (http://gis.stackexchange.com/a/10467). The edge detection is implemented by subtracting the smoothed raster from the original one.
+
+tracker=https://github.com/PavelVeselsky/fft-convolution-filter/issues
+repository=https://github.com/PavelVeselsky/fft-convolution-filter/core.py
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=raster,filter,smoothing,edge
+
+homepage=https://github.com/PavelVeselsky/fft-convolution-filter/
+category=Raster
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
