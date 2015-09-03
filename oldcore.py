@@ -1,3 +1,5 @@
+#deprecated
+
 import rasterio
 from rasterio.warp import calculate_default_transform, reproject, RESAMPLING
 import numpy as np
