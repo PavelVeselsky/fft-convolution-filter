@@ -1,0 +1,29 @@
+<html>
+<body>
+<h2>FFT CONVOLUTION</h2>
+
+FFT Convolution is a plugin for raster smoothing and edge detection based on fftconvolve() SciPy function, as included in the <a href="http://gis.stackexchange.com/a/10467/12768">gaussian_blur() function by Mike Toews</a>. The edge detection is implemented by subtracting the smoothed raster from the original one.
+<p>
+Larger rasters may be processed using a windowed or tiled algorithm, which is faster than plain one for them, but may lead to some artifacts. These should be minimal and irrelevant for most tasks.
+<p>
+<h3>Documentation</h3>
+For minimal documentation, see documentation.html.
+<p>
+<h3>Bugtracker</h3>
+<a href="https://github.com/PavelVeselsky/fft-convolution-filter/issues">https://github.com/PavelVeselsky/fft-convolution-filter/issues</a>
+</p>
+<h3>Not implemented yet</h3>
+Version 0.1.1 allows user to process rasters in any CRS and also to reproject the raster in the process, but reprojection or processing rasters in geographic CRSs may lead to inaccuracies, especially when using tiled algorithm or edge detection.
+Ungeoreferenced rasters are not supported at all.
+<p>
+<h3>License</h3>
+FFT Convolution plugin is a free software distributed under <a href="http://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License version 3.0</a> as published by the Free Software Foundation.
+<p>
+<h3>License</h3>
+First I want to thank Mike Toews for the function that became a foundation stone of this plugin.
+<p>
+Second, to Giovanni Manghi for pointing to it in the <a href="http://hub.qgis.org/projects/quantum-gis/wiki/Python_Plugin_Ideas">Python Plugin Ideas</a> page and thus inspiring me to make this plugin.
+<p>
+
+</body>
+</html>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  FFTConvolution
@@ -203,16 +204,16 @@ class FFTConvolution:
         # See if OK was pressed
         if result:
             if self.dlg.smoothing.isChecked():
-                ftype = False
+                edge = False
             else:
-                ftype = True
+                edge = True
             #call the function linking to real work
             #the input is translated from the GUI input to correct format here
             self.fft_convolution(
                 in_layer=self.dlg.input_layer.currentLayer(),
                 out_path=self.dlg.output_file.text(),
                 size=self.dlg.size.text(),
-                ftype=ftype,
+                edge=edge,
                 new_crs=self.dlg.crs.crs(),
                 tiled=self.dlg.window.isChecked(),
                 tilerows=self.dlg.window_rows.text(),
@@ -221,7 +222,7 @@ class FFTConvolution:
             )
 
     #this function parses the arguments, calls the appropriate functions and displays the new layer if needed
-    def fft_convolution( self, in_layer, out_path, size, ftype=False, new_crs=None, 
+    def fft_convolution( self, in_layer, out_path, size=10, edge=False, new_crs=None, 
                          tiled=False, tilerows=0, tilecols=0, add_layer=True ):
         #we need the CRS as EPSG code, or None if invalid
         if new_crs.isValid():
@@ -233,7 +234,7 @@ class FFTConvolution:
             in_path = in_layer.dataProvider().dataSourceUri(),
             out_path=out_path,
             size = int(re.sub(r"\D", "", size)),
-            edge=ftype, 
+            edge=edge, 
             tiled = tiled,
             tilerows = tilerows,
             tilecols = tilecols, 

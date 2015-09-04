@@ -14,10 +14,10 @@ version=0.1
 author=Pavel Veselský
 email=pavelveselsky@seznam.cz
 
-about=Smoothing and edge detection based on fftconvolve() SciPy function, as included in the gaussian_blur() function by MikeT (http://gis.stackexchange.com/a/10467). The edge detection is implemented by subtracting the smoothed raster from the original one.
+about=Smoothing and edge detection based on fftconvolve() SciPy function, as included in the gaussian_blur() function by Mike Toews (http://gis.stackexchange.com/a/10467). The edge detection is implemented by subtracting the smoothed raster from the original one.
 
 tracker=https://github.com/PavelVeselsky/fft-convolution-filter/issues
-repository=https://github.com/PavelVeselsky/fft-convolution-filter/core.py
+repository=https://github.com/PavelVeselsky/fft-convolution-filter/
 # End of mandatory metadata
 
 # Recommended items:

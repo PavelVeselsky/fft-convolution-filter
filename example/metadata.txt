@@ -1,0 +1,2 @@
+smallaster.img
+This example raster layer comes from Chris Garrard's Python for Geoprocessing course materials (http://www.gis.usu.edu/~chrisg/python/2009/). Being in UTM (EPSG:32612) and in metres, it is what is FFT Convolution plugin optimized for.
