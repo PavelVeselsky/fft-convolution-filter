@@ -10,7 +10,7 @@
 name=FFT Convolution Filters
 qgisMinimumVersion=2.0
 description=Smoothing and edge detection based on fftconvolve() SciPy function
-version=0.1.2
+version=0.1.3
 author=Pavel Veselský
 email=pavelveselsky@seznam.cz
 

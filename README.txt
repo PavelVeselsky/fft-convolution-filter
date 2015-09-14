@@ -2,7 +2,7 @@
 ********************************************************************************
 ****                                                                        ****
 ****                        FFT CONVOLUTION                                 ****
-****                         version 0.1.2                                  ****
+****                         version 0.1.3                                  ****
 ****                                                                        ****
 ********************************************************************************
 ********************************************************************************
@@ -21,8 +21,10 @@ https://github.com/PavelVeselsky/fft-convolution-filter/issues
 
 NOT IMPLEMENTED YET
 
-Version 0.1.1 allows user to process rasters in any CRS and also to reproject the raster in the process, but reprojection or processing rasters in geographic CRSs may lead to inaccuracies, especially when using tiled algorithm or edge detection.
+Version 0.1.3 allows user to process rasters in any CRS and also to reproject the raster in the process, but reprojection or processing rasters in geographic CRSs may lead to inaccuracies, especially when using tiled algorithm or edge detection.
 Ungeoreferenced rasters are not supported at all.
+WMS raster layers are not supported.
+The plugin should be available in the Processing toolbar as well, but is not.
 
 LICENSE
 

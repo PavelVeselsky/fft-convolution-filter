@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
-from PyQt4.QtGui import QAction, QIcon, QFileDialog
+from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -224,14 +224,32 @@ class FFTConvolution:
     #this function parses the arguments, calls the appropriate functions and displays the new layer if needed
     def fft_convolution( self, in_layer, out_path, size=10, edge=False, new_crs=None, 
                          tiled=False, tilerows=0, tilecols=0, add_layer=True ):
+        #if the file has no extension, add '.tif'
+        ext = os.path.splitext(out_path)[-1].lower()
+        if ext == '':
+            out_path = out_path + '.tif'
+        #if the file already exists, ask the user
+        if os.path.isfile(out_path):
+            reply = QMessageBox.question(
+                None,'File exists!','File exists - overwite it?',
+                QMessageBox.Yes, QMessageBox.No
+            )
+            if reply == QMessageBox.No:
+                return False
         #we need the CRS as EPSG code, or None if invalid
         if new_crs.isValid():
             new_crs = new_crs.authid()
         else:
             new_crs = None
+        #preprocessing the input layer's path
+        in_path = in_layer.dataProvider().dataSourceUri()
+        #QMessageBox.information(None, "DEBUG:", str(in_path))
+        if in_path.find('=') > -1:
+            QMessageBox.information(None, "Sorry!", "WMS support wasn't implemented yet!")
+            return False
         #the main computation
         layer = self.gaussian_filter(
-            in_path = in_layer.dataProvider().dataSourceUri(),
+            in_path = in_path,
             out_path=out_path,
             size = int(re.sub(r"\D", "", size)),
             edge=edge, 
