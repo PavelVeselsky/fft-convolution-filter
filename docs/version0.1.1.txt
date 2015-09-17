@@ -1,5 +1,0 @@
-WHAT'S NEW IN 0.1.1
-
-- the code didn't change except for removing some rubbish from early alpha (oldcore.py)
-- metadata and readme updated
-- added license file and minimal documentation
