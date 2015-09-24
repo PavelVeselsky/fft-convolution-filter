@@ -1,0 +1,4 @@
+WHAT'S NEW IN 0.1.5
+
+- a bug preventing installation of the plugin on Windows and OS X machines fixed
+- a minor metadata update
