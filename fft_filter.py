@@ -20,18 +20,19 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
-from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMessageBox
 # Initialize Qt resources from file resources.py
-import resources
+from . import resources
 # Import the code for the dialog
-from fft_filter_dialog import FFTConvolutionDialog
+from FFTConvolution.fft_filter_dialog import FFTConvolutionDialog
 import os.path
 from qgis.core import *
 import qgis.utils
 from qgis.gui import *
 import rasterio
-from rasterio.warp import calculate_default_transform, reproject, RESAMPLING
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 import numpy as np
 from scipy.signal import fftconvolve
 import math
@@ -191,7 +192,7 @@ class FFTConvolution:
 
 
     def select_output_file(self):
-        filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ", "", '*.tif')[0]
         self.dlg.output_file.setText(filename)
 
 
@@ -259,7 +260,7 @@ class FFTConvolution:
             new_crs = new_crs
         )
         if add_layer:
-            QgsMapLayerRegistry.instance().addMapLayers([layer])
+            QgsProject.instance().addMapLayer(layer)
             qgis.utils.iface.mapCanvas().refresh()
 
     #returns number of array dimensions
@@ -273,7 +274,7 @@ class FFTConvolution:
         baseName = fileInfo.baseName()
         rlayer = QgsRasterLayer(fileName, baseName)
         if not rlayer.isValid():
-            raise Exception("Computation finished, but layer failed to load. Inspect the path zou specified for the output layer.")
+            raise Exception("Computation finished, but layer failed to load. Inspect the path you specified for the output layer.")
         return rlayer
 
     #pads the window to process its original extend accurately
@@ -412,7 +413,7 @@ class FFTConvolution:
                 src_crs=in_raster.crs,
                 dst_transform=affine,
                 dst_crs=new_crs,
-                resampling=RESAMPLING.nearest)
+                resampling=Resampling.nearest)
         return out_raster
 
     #the original MikeT's function from http://gis.stackexchange.com/a/10467
@@ -459,7 +460,7 @@ class FFTConvolution:
     #the real work is done here
     #filters a raster specified by the file's path (in_path) and writes it to another file (out_path)
     def gaussian_filter(self, in_path, out_path, size, edge=False, tiled=False, tilerows=0, tilecols=0, new_crs=None):
-        with rasterio.drivers():
+        with rasterio.Env():
             with rasterio.open(in_path,'r') as in_raster:
                 if new_crs == None:
                     new_crs = in_raster.crs
