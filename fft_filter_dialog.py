@@ -24,7 +24,7 @@
 import os
 
 #from PyQt4 import QtGui, uic
-from qgis.PyQt import QtGui, uic
+from qgis.PyQt import QtGui, QtWidgets, uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'fft_filter_dialog_base.ui'))
