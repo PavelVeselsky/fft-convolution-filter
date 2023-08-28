@@ -203,7 +203,7 @@ class FFTConvolution(object):
 
     def select_output_file(self):
         #filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
-        filename, __, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        filename, __, __ = QFileDialog::getSaveFileName(self.dlg, "Select output file ","", '*.tif')
         self.dlg.output_file.setText(filename)
 
 
