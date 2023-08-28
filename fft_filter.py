@@ -20,7 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import absolute_import
+from future__ import absolute_import
 from builtins import range
 from builtins import object
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
@@ -41,7 +41,7 @@ from qgis.core import *
 import qgis.utils
 from qgis.gui import *
 import rasterio
-from rasterio.warp import calculate_default_transform, reproject, RESAMPLING
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 import numpy as np
 from scipy.signal import fftconvolve
 import math
@@ -424,7 +424,7 @@ class FFTConvolution(object):
                 src_crs=in_raster.crs,
                 dst_transform=affine,
                 dst_crs=new_crs,
-                resampling=RESAMPLING.nearest)
+                resampling=Resampling.nearest)
         return out_raster
 
     #the original MikeT's function from http://gis.stackexchange.com/a/10467
