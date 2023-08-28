@@ -20,12 +20,22 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
-from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
+from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMessageBox
+from qgis.PyQt.QtGui import QIcon
+#from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
+#from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
+
 # Initialize Qt resources from file resources.py
-import resources
+#import resources
+from . import resources
+
 # Import the code for the dialog
-from fft_filter_dialog import FFTConvolutionDialog
+#from fft_filter_dialog import FFTConvolutionDialog
+from .fft_filter_dialog import FFTConvolutionDialog
 import os.path
 from qgis.core import *
 import qgis.utils
@@ -37,7 +47,8 @@ from scipy.signal import fftconvolve
 import math
 import re
 
-class FFTConvolution:
+#class FFTConvolution:
+class FFTConvolution(object):
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -191,7 +202,8 @@ class FFTConvolution:
 
 
     def select_output_file(self):
-        filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        #filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        filename, __, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
         self.dlg.output_file.setText(filename)
 
 
