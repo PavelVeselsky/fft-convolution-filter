@@ -527,4 +527,4 @@ class FFTConvolution(object):
 					if edge:
 						out_array = out_array = np.subtract(in_array, out_array)
 					out_raster.write(out_array)
-        return self.__load_layer(out_path)
+	return self.__load_layer(out_path)
