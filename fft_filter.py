@@ -474,59 +474,59 @@ class FFTConvolution(object):
     #the real work is done here
     #filters a raster specified by the file's path (in_path) and writes it to another file (out_path)
     def gaussian_filter(self, in_path, out_path, size, edge=False, tiled=False, tilerows=0, tilecols=0, new_crs=None):
-		#with rasterio.drivers():
-		with rasterio.Env():
-			with rasterio.open(in_path,'r') as in_raster:
-				if new_crs == None:
-					new_crs = in_raster.crs
-				affine, height, width, kwargs = self.__compute_transform(in_raster, new_crs)
-				if tiled:
-					#we make two sets of tiles, for the old and the new raster
-					#this is important in case of reprojection
-					old_windows = self.__compute_windows(
-						in_raster=in_raster,
-						height=in_raster.height,
-						width=in_raster.width,
-						size=size,
-						tilerows=tilerows,
-						tilecols=tilecols
-					)
-					#windows for the new raster are made in two steps: generator and array
-					new_windows = self.__compute_windows(
-						in_raster=in_raster,
-						height=height,
-						width=width,
-						size=size,
-						tilerows=tilerows,
-						tilecols=tilecols,
-						generator=False
-					)
-					#if windows are too big or invalid, we process the raster without them
-					try:
-						iter(old_windows)
-						iter(new_windows)
-					except TypeError:
-						tiled = False
-				with rasterio.open(out_path,'w',**kwargs) as out_raster:
-					out_raster = self.__reproject(in_raster, out_raster, affine, new_crs)
-					if tiled:
-						for index, window in old_windows:
-							oldbigwindow = self.__extend_window(window,size,in_raster.height,in_raster.width)
-							in_array = in_raster.read(window=oldbigwindow)
-							out_array = self.__gaussian_blur(in_array, size)
-							#for edge detection we subtract the output array from the original
-							#this may produce some artifacts when the raster is reprojected
-							#or extensive and with degree coordinates
-							if edge:
-								out_array = np.subtract(in_array, out_array)
-							#now compute the window for writing into the new raster
-							nwindow = new_windows[index[0]][index[1]]
-							newbigwindow = self.__extend_window(nwindow,size,height,width)
-							out_raster.write(out_array,window=newbigwindow)
-					else:
-						in_array = in_raster.read()
-						out_array = self.__gaussian_blur(in_array, size)
-						if edge:
-							out_array = out_array = np.subtract(in_array, out_array)
-						out_raster.write(out_array)
-		return self.__load_layer(out_path)
+        #with rasterio.drivers():
+        with rasterio.Env():
+            with rasterio.open(in_path,'r') as in_raster:
+                if new_crs == None:
+                    new_crs = in_raster.crs
+                affine, height, width, kwargs = self.__compute_transform(in_raster, new_crs)
+                if tiled:
+                    #we make two sets of tiles, for the old and the new raster
+                    #this is important in case of reprojection
+                    old_windows = self.__compute_windows(
+                        in_raster=in_raster,
+                        height=in_raster.height,
+                        width=in_raster.width,
+                        size=size,
+                        tilerows=tilerows,
+                        tilecols=tilecols
+                    )
+                    #windows for the new raster are made in two steps: generator and array
+                    new_windows = self.__compute_windows(
+                        in_raster=in_raster,
+                        height=height,
+                        width=width,
+                        size=size,
+                        tilerows=tilerows,
+                        tilecols=tilecols,
+                        generator=False
+                    )
+                    #if windows are too big or invalid, we process the raster without them
+                    try:
+                        iter(old_windows)
+                        iter(new_windows)
+                    except TypeError:
+                        tiled = False
+                with rasterio.open(out_path,'w',**kwargs) as out_raster:
+                    out_raster = self.__reproject(in_raster, out_raster, affine, new_crs)
+                    if tiled:
+                        for index, window in old_windows:
+                            oldbigwindow = self.__extend_window(window,size,in_raster.height,in_raster.width)
+                            in_array = in_raster.read(window=oldbigwindow)
+                            out_array = self.__gaussian_blur(in_array, size)
+                            #for edge detection we subtract the output array from the original
+                            #this may produce some artifacts when the raster is reprojected
+                            #or extensive and with degree coordinates
+                            if edge:
+                                out_array = np.subtract(in_array, out_array)
+                            #now compute the window for writing into the new raster
+                            nwindow = new_windows[index[0]][index[1]]
+                            newbigwindow = self.__extend_window(nwindow,size,height,width)
+                            out_raster.write(out_array,window=newbigwindow)
+                    else:
+                        in_array = in_raster.read()
+                        out_array = self.__gaussian_blur(in_array, size)
+                        if edge:
+                            out_array = out_array = np.subtract(in_array, out_array)
+                        out_raster.write(out_array)
+        return self.__load_layer(out_path)
