@@ -473,7 +473,7 @@ class FFTConvolution(object):
     #the real work is done here
     #filters a raster specified by the file's path (in_path) and writes it to another file (out_path)
     def gaussian_filter(self, in_path, out_path, size, edge=False, tiled=False, tilerows=0, tilecols=0, new_crs=None):
-        with rasterio.drivers():
+        #with rasterio.drivers():
             with rasterio.open(in_path,'r') as in_raster:
                 if new_crs == None:
                     new_crs = in_raster.crs
