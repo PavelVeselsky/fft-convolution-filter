@@ -203,7 +203,8 @@ class FFTConvolution(object):
 
     def select_output_file(self):
         #filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
-        filename, __, __ = QFileDialog::getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        filename, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
+        #filename, __, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
         self.dlg.output_file.setText(filename)
 
 
@@ -271,7 +272,8 @@ class FFTConvolution(object):
             new_crs = new_crs
         )
         if add_layer:
-            QgsMapLayerRegistry.instance().addMapLayers([layer])
+            #QgsMapLayerRegistry.instance().addMapLayers([layer])
+            QgsProject.instance().addMapLayers([layer])
             qgis.utils.iface.mapCanvas().refresh()
 
     #returns number of array dimensions
