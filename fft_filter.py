@@ -41,12 +41,14 @@ from qgis.core import *
 import qgis.utils
 from qgis.gui import *
 import rasterio
+import rasterio.crs
 import rasterio.env
 from rasterio.warp import calculate_default_transform, reproject, Resampling
 import numpy as np
 from scipy.signal import fftconvolve
 import math
 import re
+import pyproj
 
 #class FFTConvolution:
 class FFTConvolution(object):
@@ -238,44 +240,62 @@ class FFTConvolution(object):
     #this function parses the arguments, calls the appropriate functions and displays the new layer if needed
     def fft_convolution( self, in_layer, out_path, size=10, edge=False, new_crs=None, 
                          tiled=False, tilerows=0, tilecols=0, add_layer=True ):
-        #if the file has no extension, add '.tif'
-        ext = os.path.splitext(out_path)[-1].lower()
-        if ext == '':
-            out_path = out_path + '.tif'
-        #if the file already exists, ask the user
-        if os.path.isfile(out_path):
-            reply = QMessageBox.question(
-                None,'File exists!','File exists - overwite it?',
-                QMessageBox.Yes, QMessageBox.No
-            )
-            if reply == QMessageBox.No:
+        
+        with rasterio.Env():
+            #if the file has no extension, add '.tif'
+            ext = os.path.splitext(out_path)[-1].lower()
+            if ext == '':
+                out_path = out_path + '.tif'
+            #if the file already exists, ask the user
+            if os.path.isfile(out_path):
+                reply = QMessageBox.question(
+                    None,'File exists!','File exists - overwite it?',
+                    QMessageBox.Yes, QMessageBox.No
+                )
+                if reply == QMessageBox.No:
+                    return False
+            #we need the CRS as EPSG code, or None if invalid
+            if new_crs.isValid():
+                #epsgObj = re.search(r"\d+", new_crs.authid())
+                #epsgNo = int(epsgObj.group())
+                #QMessageBox.information(None, "Test", "%s" % (epsgNo))
+                #crsObj = rasterio.crs.CRS.from_authority("epsg",epsgNo)
+                #crsObj = rasterio.crs.CRS.from_epsg(epsgNo)
+                #new_crs = rasterio.crs.CRS.to_wkt(crsObj)
+                #new_crs = rasterio.crs.CRS.to_string(crsObj)
+                QMessageBox.information(None, "Test", "%s" % (new_crs))
+                new_crs = new_crs.authid()
+            else:
+                new_crs = None
+            #preprocessing the input layer's path
+            in_path = in_layer.dataProvider().dataSourceUri()
+            #QMessageBox.information(None, "DEBUG:", str(in_path))
+            if in_path.find('=') > -1:
+                #QMessageBox.information(None, "Sorry!", "WMS support wasn't implemented yet!")
                 return False
-        #we need the CRS as EPSG code, or None if invalid
-        if new_crs.isValid():
-            new_crs = new_crs.authid()
-        else:
-            new_crs = None
-        #preprocessing the input layer's path
-        in_path = in_layer.dataProvider().dataSourceUri()
-        #QMessageBox.information(None, "DEBUG:", str(in_path))
-        if in_path.find('=') > -1:
-            QMessageBox.information(None, "Sorry!", "WMS support wasn't implemented yet!")
-            return False
-        #the main computation
-        layer = self.gaussian_filter(
-            in_path = in_path,
-            out_path=out_path,
-            size = int(re.sub(r"\D", "", size)),
-            edge=edge, 
-            tiled = tiled,
-            tilerows = tilerows,
-            tilecols = tilecols, 
-            new_crs = new_crs
-        )
-        if add_layer:
-            #QgsMapLayerRegistry.instance().addMapLayers([layer])
-            QgsProject.instance().addMapLayers([layer])
-            qgis.utils.iface.mapCanvas().refresh()
+            #pyproj.Proj("+init=epsg:4326")
+            #epsgObj = re.search(r"\d+", new_crs)
+            #epsgNo = int(epsgObj.group())
+            #QMessageBox.information(None, "DEBUG:", str(epsgNo))
+            #the main computation
+            layer = self.gaussian_filter(
+                in_path = in_path,
+                out_path=out_path,
+                size = int(re.sub(r"\D", "", size)),
+                edge=edge, 
+                tiled = tiled,
+                tilerows = tilerows,
+                tilecols = tilecols, 
+                new_crs = new_crs
+                #new_crs = rasterio.crs.CRS.from_epsg(epsgNo)
+                #new_crs = rasterio.crs.CRS.from_epsg(new_crs)
+                #new_crs = rasterio.crs.CRS.from_epsg(4326)
+                #new_crs = rasterio.crs.CRS.from_string(new_crs, False)
+            )
+            if add_layer:
+                #QgsMapLayerRegistry.instance().addMapLayers([layer])
+                QgsProject.instance().addMapLayers([layer])
+                qgis.utils.iface.mapCanvas().refresh()
 
     #returns number of array dimensions
     def __array_rank(self, arr):
@@ -479,6 +499,12 @@ class FFTConvolution(object):
             with rasterio.open(in_path,'r') as in_raster:
                 if new_crs == None:
                     new_crs = in_raster.crs
+                    #test
+                    #if in_raster.crs == None:
+                    #    QMessageBox.information(None, "Sorry!", "No CRS!")
+                    #    return False
+                #test
+                QMessageBox.information(None, "Test", "Old: %s New: %s" % (in_raster.crs, new_crs))
                 affine, height, width, kwargs = self.__compute_transform(in_raster, new_crs)
                 if tiled:
                     #we make two sets of tiles, for the old and the new raster
