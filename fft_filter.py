@@ -26,15 +26,11 @@ from builtins import object
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
 from qgis.PyQt.QtWidgets import QAction, QFileDialog, QMessageBox
 from qgis.PyQt.QtGui import QIcon
-#from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QFileInfo
-#from PyQt4.QtGui import QAction, QIcon, QFileDialog, QMessageBox
 
 # Initialize Qt resources from file resources.py
-#import resources
 from . import resources
 
 # Import the code for the dialog
-#from fft_filter_dialog import FFTConvolutionDialog
 from .fft_filter_dialog import FFTConvolutionDialog
 import os.path
 from qgis.core import *
@@ -205,9 +201,7 @@ class FFTConvolution(object):
 
 
     def select_output_file(self):
-        #filename = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
         filename, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
-        #filename, __, __ = QFileDialog.getSaveFileName(self.dlg, "Select output file ","", '*.tif')
         self.dlg.output_file.setText(filename)
 
 
@@ -256,27 +250,14 @@ class FFTConvolution(object):
                     return False
             #we need the CRS as EPSG code, or None if invalid
             if new_crs.isValid():
-                #epsgObj = re.search(r"\d+", new_crs.authid())
-                #epsgNo = int(epsgObj.group())
-                #QMessageBox.information(None, "Test", "%s" % (epsgNo))
-                #crsObj = rasterio.crs.CRS.from_authority("epsg",epsgNo)
-                #crsObj = rasterio.crs.CRS.from_epsg(epsgNo)
-                #new_crs = rasterio.crs.CRS.to_wkt(crsObj)
-                #new_crs = rasterio.crs.CRS.to_string(crsObj)
-                QMessageBox.information(None, "Test", "%s" % (new_crs))
                 new_crs = new_crs.authid()
             else:
                 new_crs = None
             #preprocessing the input layer's path
             in_path = in_layer.dataProvider().dataSourceUri()
-            #QMessageBox.information(None, "DEBUG:", str(in_path))
             if in_path.find('=') > -1:
                 #QMessageBox.information(None, "Sorry!", "WMS support wasn't implemented yet!")
                 return False
-            #pyproj.Proj("+init=epsg:4326")
-            #epsgObj = re.search(r"\d+", new_crs)
-            #epsgNo = int(epsgObj.group())
-            #QMessageBox.information(None, "DEBUG:", str(epsgNo))
             #the main computation
             layer = self.gaussian_filter(
                 in_path = in_path,
@@ -287,13 +268,8 @@ class FFTConvolution(object):
                 tilerows = tilerows,
                 tilecols = tilecols, 
                 new_crs = new_crs
-                #new_crs = rasterio.crs.CRS.from_epsg(epsgNo)
-                #new_crs = rasterio.crs.CRS.from_epsg(new_crs)
-                #new_crs = rasterio.crs.CRS.from_epsg(4326)
-                #new_crs = rasterio.crs.CRS.from_string(new_crs, False)
             )
             if add_layer:
-                #QgsMapLayerRegistry.instance().addMapLayers([layer])
                 QgsProject.instance().addMapLayers([layer])
                 qgis.utils.iface.mapCanvas().refresh()
 
@@ -487,7 +463,6 @@ class FFTConvolution(object):
         for i in range(count):
             band = in_array[i]
             out_band = self.__gaussian_blur1d(band, size)#.astype(in_array.dtype)
-            #if out_band != False:
             out.append( out_band )
         return np.asarray(out)
 
@@ -499,12 +474,6 @@ class FFTConvolution(object):
             with rasterio.open(in_path,'r') as in_raster:
                 if new_crs == None:
                     new_crs = in_raster.crs
-                    #test
-                    #if in_raster.crs == None:
-                    #    QMessageBox.information(None, "Sorry!", "No CRS!")
-                    #    return False
-                #test
-                QMessageBox.information(None, "Test", "Old: %s New: %s" % (in_raster.crs, new_crs))
                 affine, height, width, kwargs = self.__compute_transform(in_raster, new_crs)
                 if tiled:
                     #we make two sets of tiles, for the old and the new raster

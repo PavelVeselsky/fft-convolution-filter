@@ -23,7 +23,6 @@
 
 import os
 
-#from PyQt4 import QtGui, uic
 from qgis.PyQt import QtGui, QtWidgets, uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -38,5 +37,4 @@ class FFTConvolutionDialog(QtWidgets.QDialog, FORM_CLASS):
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
