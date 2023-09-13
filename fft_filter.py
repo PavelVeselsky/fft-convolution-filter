@@ -44,7 +44,7 @@ import numpy as np
 from scipy.signal import fftconvolve
 import math
 import re
-import pyproj
+import numba as nb
 
 #class FFTConvolution:
 class FFTConvolution(object):
@@ -256,7 +256,6 @@ class FFTConvolution(object):
             #preprocessing the input layer's path
             in_path = in_layer.dataProvider().dataSourceUri()
             if in_path.find('=') > -1:
-                #QMessageBox.information(None, "Sorry!", "WMS support wasn't implemented yet!")
                 return False
             #the main computation
             layer = self.gaussian_filter(
@@ -469,7 +468,6 @@ class FFTConvolution(object):
     #the real work is done here
     #filters a raster specified by the file's path (in_path) and writes it to another file (out_path)
     def gaussian_filter(self, in_path, out_path, size, edge=False, tiled=False, tilerows=0, tilecols=0, new_crs=None):
-        #with rasterio.drivers():
         with rasterio.Env():
             with rasterio.open(in_path,'r') as in_raster:
                 if new_crs == None:
@@ -503,7 +501,7 @@ class FFTConvolution(object):
                     except TypeError:
                         tiled = False
                 with rasterio.open(out_path,'w',**kwargs) as out_raster:
-                    out_raster = self.__reproject(in_raster, out_raster, affine, new_crs)
+                    
                     if tiled:
                         for index, window in old_windows:
                             oldbigwindow = self.__extend_window(window,size,in_raster.height,in_raster.width)
@@ -513,7 +511,8 @@ class FFTConvolution(object):
                             #this may produce some artifacts when the raster is reprojected
                             #or extensive and with degree coordinates
                             if edge:
-                                out_array = np.subtract(in_array, out_array)
+                                diff_array = np.subtract(in_array, out_array)
+                                out_array = in_array + diff_array
                             #now compute the window for writing into the new raster
                             nwindow = new_windows[index[0]][index[1]]
                             newbigwindow = self.__extend_window(nwindow,size,height,width)
@@ -522,6 +521,7 @@ class FFTConvolution(object):
                         in_array = in_raster.read()
                         out_array = self.__gaussian_blur(in_array, size)
                         if edge:
-                            out_array = out_array = np.subtract(in_array, out_array)
+                            diff_array = np.subtract(in_array, out_array)
+                            out_array = in_array + diff_array
                         out_raster.write(out_array)
         return self.__load_layer(out_path)
