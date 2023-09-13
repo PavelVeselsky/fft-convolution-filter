@@ -435,6 +435,7 @@ class FFTConvolution(object):
                 raise Exception("Null array can't be processed!")
         except TypeError:
             raise Exception("Null array can't be processed!")
+
         # expand in_array to fit edge of kernel
         padded_array = np.pad(in_array, size, 'symmetric').astype(float)
         # build kernel
